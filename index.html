@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mente Vacuna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF6EC;
+    --ink:#201C1A;
+    --spot:#232020;
+    --pink:#FF7A93;
+    --pink-dim:#F25C79;
+    --brass:#F0B429;
+    --white:#FFFFFF;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    margin:0; padding:0; height:100%; overflow:hidden;
+    background:var(--cream);
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+  }
+  #app{ position:relative; width:100vw; height:100vh; height:100dvh; }
+
+  /* ---------- Manchas de vaca de fondo ---------- */
+  #app::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(ellipse 140px 100px at 8% 12%, var(--spot) 0%, var(--spot) 60%, transparent 62%),
+      radial-gradient(ellipse 110px 160px at 92% 8%, var(--spot) 0%, var(--spot) 60%, transparent 62%),
+      radial-gradient(ellipse 180px 120px at 88% 78%, var(--spot) 0%, var(--spot) 60%, transparent 62%),
+      radial-gradient(ellipse 120px 90px at 4% 88%, var(--spot) 0%, var(--spot) 60%, transparent 62%),
+      radial-gradient(ellipse 90px 130px at 50% 96%, var(--spot) 0%, var(--spot) 60%, transparent 62%);
+    opacity:0.06;
+    pointer-events:none;
+  }
+
+  /* ---------- Pantalla de entrada ---------- */
+  #entry{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 6vh 6vw;
+    gap: 5vh;
+    z-index:2;
+  }
+  .eyebrow{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-size:13px; letter-spacing:0.24em; text-transform:uppercase;
+    color:var(--pink-dim); font-weight:800; margin-bottom:6px; text-align:center;
+  }
+  .bell{
+    display:inline-block;
+    transform-origin: top center;
+    animation: swing 2.6s ease-in-out infinite;
+    font-size:16px;
+  }
+  @keyframes swing{
+    0%,100%{ transform:rotate(-8deg); }
+    50%{ transform:rotate(8deg); }
+  }
+  h1.title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:clamp(38px, 11vw, 58px);
+    letter-spacing:0.005em;
+    margin:0;
+    text-align:center;
+    color:var(--ink);
+    line-height:0.98;
+  }
+  h1.title span{ color:var(--pink); }
+
+  .card{
+    position:relative;
+    width:100%; max-width:420px;
+    background:var(--white);
+    color:var(--ink);
+    border-radius: 38px 42px 36px 44px;
+    padding: 32px 26px 26px;
+    box-shadow: 0 18px 40px rgba(32,28,26,0.14);
+    border: 3px solid var(--ink);
+  }
+  .card::after{
+    content:"";
+    position:absolute; top:-14px; right:26px;
+    width:30px; height:30px;
+    background:var(--spot);
+    border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
+  }
+  .card::before{
+    content:"";
+    position:absolute; bottom:10px; left:-10px;
+    width:20px; height:16px;
+    background:var(--spot);
+    border-radius: 50% 50% 45% 55% / 55% 55% 45% 45%;
+  }
+  label.field-label{
+    display:block;
+    font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
+    font-weight:800; color:var(--pink-dim); margin-bottom:10px;
+  }
+  input#word-input{
+    width:100%;
+    border:none; border-bottom:3px solid var(--ink);
+    background:transparent;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:clamp(24px, 6.5vw, 32px);
+    color:var(--ink);
+    padding:6px 2px 12px;
+    outline:none;
+  }
+  input#word-input::placeholder{ color:#c9bfae; -webkit-text-fill-color:#c9bfae; }
+  input#word-input:focus{ border-bottom-color:var(--pink); }
+
+  button#show-btn{
+    margin-top:8px;
+    width:100%;
+    max-width:420px;
+    border:3px solid var(--ink);
+    border-radius:999px;
+    background:var(--pink);
+    color:var(--ink);
+    font-family:'Nunito', sans-serif;
+    font-weight:800;
+    font-size:18px;
+    letter-spacing:0.01em;
+    padding:16px 20px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    cursor:pointer;
+    transition: transform .12s ease, background .12s ease;
+    box-shadow: 0 6px 0 var(--ink);
+  }
+  button#show-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 var(--ink); background:var(--pink-dim); }
+  button#show-btn:disabled{ opacity:0.35; box-shadow:none; transform:none; }
+  button#show-btn svg{ width:18px; height:18px; }
+
+  .hint{
+    font-size:13px; color:var(--ink); opacity:0.55; text-align:center; max-width:320px;
+    font-weight:600;
+  }
+
+  /* ---------- Pantalla grande ---------- */
+  #display{
+    position:absolute; inset:0;
+    display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    background:var(--ink);
+    z-index:3;
+    padding: 8vw;
+    cursor:pointer;
+    overflow:hidden;
+  }
+  #display.active{ display:flex; }
+  #display::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(ellipse 160px 110px at 90% 15%, var(--white) 0%, var(--white) 60%, transparent 62%),
+      radial-gradient(ellipse 130px 180px at 6% 85%, var(--white) 0%, var(--white) 60%, transparent 62%);
+    opacity:0.045;
+    pointer-events:none;
+  }
+
+  #display-word{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size: 15vw;
+    line-height:0.94;
+    text-align:center;
+    color:var(--white);
+    word-break: break-word;
+    max-width: 100%;
+    opacity:0; transform: scale(0.85);
+    position:relative;
+    z-index:1;
+  }
+  #display-word.pop{
+    animation: popIn .38s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  @keyframes popIn{
+    to{ opacity:1; transform:scale(1); }
+  }
+
+  .back-hint{
+    position:absolute;
+    bottom: max(28px, env(safe-area-inset-bottom));
+    left:0; right:0;
+    text-align:center;
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--brass);
+    opacity:0.9;
+    font-weight:800;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    z-index:1;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #display-word.pop{ animation:none; opacity:1; transform:none; }
+    .bell{ animation:none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="entry">
+    <div>
+      <div class="eyebrow"><span class="bell">🔔</span> Mente Vacuna</div>
+      <h1 class="title">Piensa como<br><span>el rebaño</span></h1>
+    </div>
+
+    <form class="card" id="word-form">
+      <label class="field-label">Lo que crees que responderá la mayoría</label>
+      <input id="word-input" type="text" placeholder="Ej: pizza" autocomplete="off" autocorrect="off" maxlength="40">
+    </form>
+
+    <button id="show-btn" disabled>
+      Mostrar en grande
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+
+    <div class="hint">Cada uno escribe su respuesta sin ver la de los demás. Al pulsar, se muestra en grande para comparar quién piensa como el rebaño.</div>
+  </div>
+
+  <div id="display">
+    <div id="display-word"></div>
+    <div class="back-hint">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      Toca la pantalla para la siguiente pregunta
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const entry = document.getElementById('entry');
+  const display = document.getElementById('display');
+  const displayWord = document.getElementById('display-word');
+  const input = document.getElementById('word-input');
+  const showBtn = document.getElementById('show-btn');
+  const form = document.getElementById('word-form');
+
+  function updateButtonState(){
+    showBtn.disabled = input.value.trim().length === 0;
+  }
+  input.addEventListener('input', updateButtonState);
+
+  function showWord(){
+    const word = input.value.trim();
+    if(!word) return;
+    displayWord.textContent = word;
+    const len = word.length;
+    let size = 15;
+    if(len > 6) size = 12;
+    if(len > 10) size = 9.5;
+    if(len > 14) size = 7;
+    displayWord.style.fontSize = size + 'vw';
+
+    display.classList.add('active');
+    displayWord.classList.remove('pop');
+    void displayWord.offsetWidth;
+    displayWord.classList.add('pop');
+  }
+
+  function goBack(){
+    display.classList.remove('active');
+    input.value = '';
+    updateButtonState();
+    setTimeout(()=> input.focus(), 50);
+  }
+
+  form.addEventListener('submit', (e)=>{ e.preventDefault(); showWord(); });
+  showBtn.addEventListener('click', showWord);
+  display.addEventListener('click', goBack);
+
+  updateButtonState();
+</script>
+</body>
+</html>
